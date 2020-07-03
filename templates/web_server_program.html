@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    </head>
+    
+    <body>
+
+        <!--img src="http://192.168.1.176:8081" /--> <!--Enter the IP Address of your BeagleBone Blue-->
+
+        <div style=" height:400px; width:300px; float:right;">
+            <center>
+                <h2>Control Robot</h2><br><br>
+                <a href="#" id="up" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br>
+            </center>
+            <a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
+            <center><a href="#" id="down" style="font-size:30px;text-decoration:none;"> Backward<br> &#x1F883;&#x1F883;</a></center>
+
+            <input type="text" name="formname" value="{{name}}" id="formname">
+            <input type="button" value="ASSUME CONTROL" id="assume_control"></input>
+        </div>
+
+        <script>
+            $( document ).ready(function(){
+                qstring = '?formname='+ document.getElementById('formname').value
+
+                $("#down").on("mousedown", function() {
+                 $.get('/down_side'+qstring);
+                 }).on('mouseup', function() {
+                 $.get('/stop'+qstring);
+                });
+
+                $("#up").on("mousedown", function() {
+                 $.get('/up_side'+qstring);
+                 }).on('mouseup', function() {
+                 $.get('/stop'+qstring);
+                });
+
+                $("#left").on("mousedown", function() {
+                 $.get('/left_side'+qstring);
+                 }).on('mouseup', function() {
+                 $.get('/stop'+qstring);
+                });
+
+                $("#right").on("mousedown", function() {
+                 $.get('/right_side'+qstring);
+                 }).on('mouseup', function() {
+                 $.get('/stop'+qstring);
+                });
+
+                $("#assume_control").on("click", function() {
+                 $.get('/assume_control?formname='+document.getElementById('formname').value);
+                });
+            });
+        </script>
+    </body>
+</html>
