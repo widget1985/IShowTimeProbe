@@ -7,17 +7,29 @@
 
         <!--img src="http://192.168.1.176:8081" /--> <!--Enter the IP Address of your BeagleBone Blue-->
 
-        <div style=" height:400px; width:300px; float:right;">
-            <center>
-                <h2>Control Robot</h2><br><br>
-                <a href="#" id="up" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br>
-            </center>
-            <a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
-            <center><a href="#" id="down" style="font-size:30px;text-decoration:none;"> Backward<br> &#x1F883;&#x1F883;</a></center>
-
-            <input type="text" name="formname" value="{{name}}" id="formname">
-            <input type="button" value="ASSUME CONTROL" id="assume_control"></input>
+        <div style=" height:400px; width:300px; float:right;">        
+            <div id='incontrol'>
+                <center><h2>Control Robot</h2><br><br></center>
+                <center><a href="#" id="up" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br></center>
+                <a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
+                <center><a href="#" id="down" style="font-size:30px;text-decoration:none;"> Backward<br> &#x1F883;&#x1F883;</a></center>
+                <p>Robo will no longer take orders from you after </p>
+                <p id='timeleft'></p>
+                <p>more seconds of inactivity</p>
+            </div>
+            
+            <div id='waiturturn'>
+                <p>Someone else is driving the robo - watch the show and seize control in: </p>
+                <p id='momentofopportunity'></p>
+                <p>more seconds of inactivity</p>
+            </div>
+            
+            <div id="siezecontrol">
+                <p>No one is driving the robo! give it a super secret name and then SEIZE CONTROL!</p>
+                <input type="text" name="formname" value="{{name}}" id="formname">
+                <input type="button" value="SIEZE CONTROL" id="assume_control"></input>
+            </div>
         </div>
 
         <script>
@@ -49,9 +61,39 @@
                 });
 
                 $("#assume_control").on("click", function() {
-                 $.get('/assume_control?formname='+document.getElementById('formname').value);
+                 //$.get('/assume_control?formname='+document.getElementById('formname').value);
+                 $.get('/assume_control', {"formname": document.getElementById('formname').value}, userfeedback)
                 });
+
+                function feedbackcallback(data, textStatus, jqXHR){
+                    if (data.control) {
+                        // you have the con
+                        document.getElementById('incontrol').setAttribute('style', 'display:block;')
+                        document.getElementById('waiturturn').setAttribute('style', 'display:none;')
+                        document.getElementById('siezecontrol').setAttribute('style', 'display:none;')
+                        document.getElementById('timeleft').innerHTML = data.timeleft
+                    } else if (!data.possessed) {
+                        // robo is up for grabs
+                        document.getElementById('incontrol').setAttribute('style', 'display:none;')
+                        document.getElementById('waiturturn').setAttribute('style', 'display:none;')
+                        document.getElementById('siezecontrol').setAttribute('style', 'display:block;')
+                    } else {
+                        // another ghost possesses the robo
+                        document.getElementById('incontrol').setAttribute('style', 'display:none;')
+                        document.getElementById('waiturturn').setAttribute('style', 'display:block;')
+                        document.getElementById('siezecontrol').setAttribute('style', 'display:none;')
+                        document.getElementById('momentofopportunity').innerHTML = data.timeleft
+                    }
+                }
+
+                function userfeedback(){
+                     $.get('/feedback', {"formname": document.getElementById('formname').value}, feedbackcallback)
+                }
+
+                setInterval(userfeedback,1000);
+                userfeedback();
             });
+
         </script>
     </body>
 </html>
