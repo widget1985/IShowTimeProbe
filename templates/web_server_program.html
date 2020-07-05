@@ -61,7 +61,6 @@
                 });
 
                 $("#assume_control").on("click", function() {
-                 //$.get('/assume_control?formname='+document.getElementById('formname').value);
                  $.get('/assume_control', {"formname": document.getElementById('formname').value}, userfeedback)
                 });
 
