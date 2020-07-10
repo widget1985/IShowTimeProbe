@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG)
 program_path = "~/BBrobotics-book/rc_wheeled_auto_noimu/rc_wheeled_auto_noimu "
 app.true_name = None
 app.possession_time = 0
-app.max_inactivity = 30 # seconds until an inactive user is booted
+app.max_inactivity = 8 # seconds until an inactive user is booted
 
 @app.route("/")
 def index():
@@ -21,7 +21,7 @@ def left_side():
     data1="LEFT"
     name=request.args.get('formname')
     if name == app.true_name:
-        #os.system(program_path + str(90) + " " + str(0))
+        os.system(program_path + str(10) + " " + str(0))
         app.possession_time = time.time()
         app.logger.debug('left command accepted from ' + name) 
     else:
@@ -33,7 +33,7 @@ def right_side():
     data1="RIGHT"
     name=request.args.get('formname')
     if name == app.true_name:
-        #os.system(program_path + str(-90) + " " + str(0))
+        os.system(program_path + str(-10) + " " + str(0))
         app.possession_time = time.time()
         app.logger.debug('right command accepted from' + name) 
     else:
@@ -45,7 +45,7 @@ def up_side():
     data1="FORWARD"
     name=request.args.get('formname')
     if name == app.true_name:
-        #os.system(program_path + str(0) + " " + str(12))
+        os.system(program_path + str(0) + " " + str(24))
         app.possession_time = time.time()
         app.logger.debug('forward command accepted from' + name) 
     else:
@@ -57,7 +57,7 @@ def down_side():
     data1="BACK"
     name=request.args.get('formname')
     if name == app.true_name:
-        #os.system(program_path + str(180) + " " + str(1))
+        os.system(program_path + str(0) + " " + str(-24))
         app.possession_time = time.time()
         app.logger.debug('down command accepted from ' + name) 
     else:
@@ -112,5 +112,6 @@ def ispossessed():
 
 if __name__ == "__main__":
     print("Start")
-    app.run(host='0.0.0.0',port=5010)
+    #app.run(host='0.0.0.0',port=5010)
+    app.run(host='0.0.0.0',port=8090)
 
