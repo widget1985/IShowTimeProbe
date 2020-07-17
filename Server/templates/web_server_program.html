@@ -3,6 +3,31 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     </head>
     
+    <style>
+#container {
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  background: grey;
+  border-radius: 50%;
+}
+#circle1 {
+    background: yellow;
+    left: 190px;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    border-radius: 50%;
+}
+#cursor {
+  width: 25px;
+  height: 25px;
+  position: relative;
+  background-color: red;
+  border-radius: 50%;
+}
+</style>
+    
     <body>
 
         <!--img src="http://192.168.1.176:8081" /--> <!--Enter the IP Address of your BeagleBone Blue-->
@@ -13,20 +38,31 @@
              <!img src="http://192.168.1.176:8090/?action=stream" />
             <img src="http://192.168.1.67:8075/?action=stream" />
         </div>
+        
+
             
-        <div style=" height:400px; width:300px; float:right;">    
-              
+        <div style=" height:1000px; width:300px; float:right;">    
+          
             
             <!-- control portion -->
             <div id='incontrol'>
-                <center><h2>Control Robot</h2><br><br></center>
-                <center><a href="#" id="up" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br></center>
-                <a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
-                <center><a href="#" id="down" style="font-size:30px;text-decoration:none;"> Backward<br> &#x1F883;&#x1F883;</a></center>
-                <p>Robo will no longer take orders from you after </p>
-                <p id='timeleft'></p>
-                <p>more seconds of inactivity</p>
+                <div> 
+                    <center><h2>Control Robot</h2><br><br></center>
+                    
+                    <center><a href="#" id="up" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br></center>
+                    <a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
+                    <center><a href="#" id="down" style="font-size:30px;text-decoration:none;"> Backward<br> &#x1F883;&#x1F883;</a></center>
+                    <p>Robo will no longer take orders from you after </p>
+                    <p id='timeleft'></p>
+                    <p>more seconds of inactivity</p>
+                    
+                    <!-- replace the top controls with this? -->
+                    <div id ="container">
+                        <div id ="cursor"></div>
+                    </div>
+                    
+                </div>
             </div>
             
             <div id='waiturturn'>
@@ -102,6 +138,85 @@
                 setInterval(userfeedback,1000);
                 userfeedback();
             });
+            
+            //code for using the "joystick drive"
+            //right now it only outputs commands to the console
+                      
+        container.addEventListener("mousedown", getClickPosition, false);
+        container.addEventListener("mouseup", resetToCenter, false);
+
+        var elem = document.getElementById("cursor");
+        var cnt = document.getElementById("container"); 
+
+        function setToCenter(e){
+            var parentPosition = getPosition(e.currentTarget);
+            var xPosition =  -parentPosition.x + cnt.clientWidth/2 - (elem.clientWidth / 2);
+            var yPosition =  -parentPosition.y + cnt.clientHeight/2 - (elem.clientHeight / 2);
+            elem.style.left = xPosition + "px";
+            elem.style.top = yPosition + "px";
+            console.log("center: " + xPosition + " " + yPosition);
+        }
+
+        setToCenter(elem);
+
+        function resetToCenter(){
+            setToCenter(elem);
+        }
+
+        //gets click position and converts it to polarCoordinates
+        //make these coordinates go to the robot eventually
+        function getClickPosition(e) {
+            var parentPosition = getPosition(e.currentTarget);
+            
+            var xPosition = e.clientX - parentPosition.x - (elem.clientWidth / 2);
+            var yPosition = e.clientY - parentPosition.y - (elem.clientHeight / 2);
+            
+            elem.style.left = xPosition + "px";
+            elem.style.top = yPosition + "px";
+            
+            xParentCenter = parentPosition.x + cnt.clientWidth/2;
+            yParentCenter = parentPosition.y + cnt.clientHeight/2;
+            
+            coord = cartesian2Polar(e.clientX - xParentCenter, e.clientY - yParentCenter);
+            
+            console.log(coord.distance + " " + (coord.radians * (180/Math.PI)));
+            console.log(e.clientX - xParentCenter, e.clientY - yParentCenter);
+            console.log(xPosition + " " + yPosition);
+        }
+
+        function cartesian2Polar(x, y){
+            distance = Math.sqrt(x*x + y*y)
+            radians = Math.atan2(y,x) //This takes y first
+            polarCoor = { distance:distance, radians:radians }
+            return polarCoor
+        }
+
+        // Helper function to get an element's exact position
+        function getPosition(el) {
+          var xPos = 0;
+          var yPos = 0;
+         
+          while (el) {
+            if (el.tagName == "BODY") {
+              // deal with browser quirks with body/window/document and page scroll
+              var xScroll = el.scrollLeft || document.documentElement.scrollLeft;
+              var yScroll = el.scrollTop || document.documentElement.scrollTop;
+         
+              xPos += (el.offsetLeft - xScroll + el.clientLeft);
+              yPos += (el.offsetTop - yScroll + el.clientTop);
+            } else {
+              // for all other non-BODY elements
+              xPos += (el.offsetLeft - el.scrollLeft + el.clientLeft);
+              yPos += (el.offsetTop - el.scrollTop + el.clientTop);
+            }
+         
+            el = el.offsetParent;
+          }
+          return {
+            x: xPos,
+            y: yPos
+          };
+        }
 
         </script>
     </body>
