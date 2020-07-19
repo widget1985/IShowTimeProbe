@@ -25,6 +25,11 @@
   position: relative;
   background-color: red;
   border-radius: 50%;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 </style>
     
@@ -79,6 +84,9 @@
         </div>
 
         <script>
+            var elem = document.getElementById("cursor");
+            var cnt = document.getElementById("container");
+
             $( document ).ready(function(){
                 qstring = '?formname='+ document.getElementById('formname').value
 
@@ -110,6 +118,20 @@
                  $.get('/assume_control', {"formname": document.getElementById('formname').value}, userfeedback)
                 });
 
+                $("#container").on("mousedown", function(e){
+                  coords = getClickPosition(e);
+                  $.get('/polar_in', {
+                    "formname": document.getElementById('formname').value,
+                    "distance": coords.distance,
+                    "radians": coords.radians
+                  })
+                }).on('mouseup', function(){
+                    $.get('/stop', {
+                      "formname": document.getElementById('formname').value
+                    })
+                    resetToCenter();
+                });
+
                 function feedbackcallback(data, textStatus, jqXHR){
                     if (data.control) {
                         // you have the con
@@ -138,15 +160,9 @@
                 setInterval(userfeedback,1000);
                 userfeedback();
             });
-            
+
             //code for using the "joystick drive"
             //right now it only outputs commands to the console
-                      
-        container.addEventListener("mousedown", getClickPosition, false);
-        container.addEventListener("mouseup", resetToCenter, false);
-
-        var elem = document.getElementById("cursor");
-        var cnt = document.getElementById("container"); 
 
         function setToCenter(e){
             var parentPosition = getPosition(e.currentTarget);
@@ -182,6 +198,7 @@
             console.log(coord.distance + " " + (coord.radians * (180/Math.PI)));
             console.log(e.clientX - xParentCenter, e.clientY - yParentCenter);
             console.log(xPosition + " " + yPosition);
+            return coord;
         }
 
         function cartesian2Polar(x, y){

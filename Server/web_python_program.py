@@ -23,7 +23,7 @@ def left_side():
     if name == app.true_name:
         os.system(program_path + str(10) + " " + str(0))
         app.possession_time = time.time()
-        app.logger.debug('left command accepted from ' + name) 
+        app.logger.debug('left command accepted from ' + name)
     else:
         app.logger.debug('left command REJECTED from ' + name)
     return 'true'
@@ -35,7 +35,7 @@ def right_side():
     if name == app.true_name:
         os.system(program_path + str(-10) + " " + str(0))
         app.possession_time = time.time()
-        app.logger.debug('right command accepted from' + name) 
+        app.logger.debug('right command accepted from ' + name)
     else:
         app.logger.debug('right command REJECTED from ' + name)
     return 'true'
@@ -47,7 +47,7 @@ def up_side():
     if name == app.true_name:
         os.system(program_path + str(0) + " " + str(24))
         app.possession_time = time.time()
-        app.logger.debug('forward command accepted from' + name) 
+        app.logger.debug('forward command accepted from ' + name)
     else:
         app.logger.debug('forward command REJECTED from ' + name)
     return 'true'
@@ -59,7 +59,7 @@ def down_side():
     if name == app.true_name:
         os.system(program_path + str(0) + " " + str(-24))
         app.possession_time = time.time()
-        app.logger.debug('down command accepted from ' + name) 
+        app.logger.debug('down command accepted from ' + name)
     else:
         app.logger.debug('down command REJECTED from ' + name)
     return 'true'
@@ -69,9 +69,9 @@ def stop():
     data1="STOP"
     name=request.args.get('formname')
     if name == app.true_name:
-        #os.system(program_path + str(0) + " " + str(0))
+        os.system(program_path + str(0) + " " + str(0))
         app.possession_time = time.time()
-        app.logger.debug('stop command accepted from ' + name) 
+        app.logger.debug('stop command accepted from ' + name)
     else:
         app.logger.debug('stop command REJECTED from ' + name)
     return  'true'
@@ -104,6 +104,20 @@ def feedback():
           "formname": formname,
           "timeleft": app.max_inactivity - (time.time() - app.possession_time)
       }
+
+@app.route('/polar_in')
+def polar_in():
+    name=request.args.get('formname')
+    radians=request.args.get('radians')
+    distance=request.args.get('distance')
+    if name == app.true_name:
+        #os.system(program_path + str(0) + " " + str(-24))
+        # insert system call here using variables radians and distance
+        app.possession_time = time.time()
+        app.logger.debug('polar command accepted from ' + name + ' for ' + radians + ' radians and ' + distance + ' from center') 
+    else:
+        app.logger.debug('polar command REJECTED from ' + name)
+    return 'true'
 
 def ispossessed():
   
