@@ -6,7 +6,10 @@ app = Flask(__name__)
 #app = Flask(__name__, template_folder='/home/debian/BBrobotics-book/flask_control_server')
 logging.basicConfig(level=logging.DEBUG)
 
-program_path = "~/BBrobotics-book/rc_wheeled_auto_noimu/rc_wheeled_auto_noimu "
+#program_path = "~/BBrobotics-book/rc_wheeled_auto_noimu/rc_wheeled_auto_noimu "
+program_path = "~/BBrobotics-book/IShowTimeProbe/RobotControl/rc_mecanum_auto_noimu/rc_mecanum_auto_noimu "
+servo_path = "~/BBrobotics-book/IShowTimeProbe/RobotControl/rc_servo_move/rc_servo_move "
+
 app.true_name = None
 app.possession_time = 0
 app.max_inactivity = 8 # seconds until an inactive user is booted
@@ -21,7 +24,7 @@ def left_side():
     data1="LEFT"
     name=request.args.get('formname')
     if name == app.true_name:
-        os.system(program_path + str(10) + " " + str(0))
+        os.system(program_path + "0 0 " + str(.4) + " " +  str(3) )
         app.possession_time = time.time()
         app.logger.debug('left command accepted from ' + name)
     else:
@@ -33,7 +36,7 @@ def right_side():
     data1="RIGHT"
     name=request.args.get('formname')
     if name == app.true_name:
-        os.system(program_path + str(-10) + " " + str(0))
+        os.system(program_path + "0 0 " + str(-.4) + " " +  str(3) )
         app.possession_time = time.time()
         app.logger.debug('right command accepted from ' + name)
     else:
@@ -45,7 +48,7 @@ def up_side():
     data1="FORWARD"
     name=request.args.get('formname')
     if name == app.true_name:
-        os.system(program_path + str(0) + " " + str(24))
+        os.system("sudo -S %s"% (servo_path + "-.5"))
         app.possession_time = time.time()
         app.logger.debug('forward command accepted from ' + name)
     else:
@@ -57,7 +60,8 @@ def down_side():
     data1="BACK"
     name=request.args.get('formname')
     if name == app.true_name:
-        os.system(program_path + str(0) + " " + str(-24))
+        os.system("sudo -S %s"% (servo_path + ".5") )
+        #os.system(program_path + "-.5 0 0 " +  str(3) )
         app.possession_time = time.time()
         app.logger.debug('down command accepted from ' + name)
     else:
@@ -69,7 +73,7 @@ def stop():
     data1="STOP"
     name=request.args.get('formname')
     if name == app.true_name:
-        os.system(program_path + str(0) + " " + str(0))
+        os.system(program_path + "0 0 0 " +  str(0) )
         app.possession_time = time.time()
         app.logger.debug('stop command accepted from ' + name)
     else:
@@ -108,15 +112,16 @@ def feedback():
 @app.route('/polar_in')
 def polar_in():
     name=request.args.get('formname')
-    radians=request.args.get('radians')
-    distance=request.args.get('distance')
+    #radians=request.args.get('radians')
+    #distance=request.args.get('distance')
+    distX = request.args.get('distX')
+    distY = request.args.get('distY')
     if name == app.true_name:
-        #os.system(program_path + str(0) + " " + str(-24))
-        # insert system call here using variables radians and distance
+        os.system(program_path + distY + " " + distX + " " +  str(0) + " " +  str(5) )
         app.possession_time = time.time()
-        app.logger.debug('polar command accepted from ' + name + ' for ' + radians + ' radians and ' + distance + ' from center') 
+        app.logger.debug(' polar command accepted from ' + name + ' for X:' + distX + ' and Y:' + distY + ' from center') 
     else:
-        app.logger.debug('polar command REJECTED from ' + name)
+        app.logger.debug(' polar command REJECTED from ' + name)
     return 'true'
 
 def ispossessed():

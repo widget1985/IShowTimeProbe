@@ -5,20 +5,13 @@
     
     <style>
 #container {
-  width: 400px;
-  height: 400px;
+  width: 200px;
+  height: 200px;
   position: absolute;
   background: grey;
   border-radius: 50%;
 }
-#circle1 {
-    background: yellow;
-    left: 190px;
-    width: 20px;
-    height: 20px;
-    position: relative;
-    border-radius: 50%;
-}
+
 #cursor {
   width: 25px;
   height: 25px;
@@ -58,11 +51,12 @@
                     <a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
                     <center><a href="#" id="down" style="font-size:30px;text-decoration:none;"> Backward<br> &#x1F883;&#x1F883;</a></center>
+                    
                     <p>Robo will no longer take orders from you after </p>
                     <p id='timeleft'></p>
                     <p>more seconds of inactivity</p>
                     
-                    <!-- replace the top controls with this? -->
+                     <!-- replace the top controls with this? -->
                     <div id ="container">
                         <div id ="cursor"></div>
                     </div>
@@ -122,8 +116,10 @@
                   coords = getClickPosition(e);
                   $.get('/polar_in', {
                     "formname": document.getElementById('formname').value,
-                    "distance": coords.distance,
-                    "radians": coords.radians
+                    //"distance": coords.distance,
+                    //"radians": coords.radians
+                    "distX": coords.X,
+                    "distY": coords.Y
                   })
                 }).on('mouseup', function(){
                     $.get('/stop', {
@@ -193,12 +189,14 @@
             xParentCenter = parentPosition.x + cnt.clientWidth/2;
             yParentCenter = parentPosition.y + cnt.clientHeight/2;
             
-            coord = cartesian2Polar(e.clientX - xParentCenter, e.clientY - yParentCenter);
+            polarCoord = cartesian2Polar(e.clientX - xParentCenter, e.clientY - yParentCenter);
+            xyCoord = {X:-(e.clientX - xParentCenter) / (cnt.clientWidth/2), Y:-(e.clientY - yParentCenter) / (cnt.clientHeight/2)};
             
-            console.log(coord.distance + " " + (coord.radians * (180/Math.PI)));
-            console.log(e.clientX - xParentCenter, e.clientY - yParentCenter);
-            console.log(xPosition + " " + yPosition);
-            return coord;
+            //console.log(polarCoord.distance + " " + (polarCoord.radians * (180/Math.PI)));
+            //console.log(e.clientX - xParentCenter, e.clientY - yParentCenter);
+            //console.log(xPosition + " " + yPosition);
+            console.log("coord: " + xyCoord.X, + " " + xyCoord.Y);
+            return xyCoord;
         }
 
         function cartesian2Polar(x, y){
