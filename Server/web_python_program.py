@@ -19,53 +19,28 @@ def index():
     randoname = requests.get('https://frightanic.com/goodies_content/docker-names.php').text
     return render_template('web_server_program.html', name=randoname)
 
-@app.route('/left_side')
-def left_side():
-    data1="LEFT"
+@app.route('/updown_in')
+def updown_in():
     name=request.args.get('formname')
+    distY = request.args.get('distY')
     if name == app.true_name:
-        os.system("echo $MY_SUDO_PASS | sudo -S %s"% (program_path + "0 0 " + str(.4) + " " +  str(3) ))
+        os.system("echo $MY_SUDO_PASS | sudo -S %s"% (servo_path + distY))
         app.possession_time = time.time()
-        app.logger.debug('left command accepted from ' + name)
+        app.logger.debug('updown command accepted from ' + name)
     else:
-        app.logger.debug('left command REJECTED from ' + name)
+        app.logger.debug(' updown command REJECTED from ' + name)
     return 'true'
 
-@app.route('/right_side')
-def right_side():
-    data1="RIGHT"
+@app.route('/leftright_in')
+def leftright_in():
     name=request.args.get('formname')
+    distX = request.args.get('distX')
     if name == app.true_name:
-        os.system("echo $MY_SUDO_PASS | sudo -S %s"% (program_path + "0 0 " + str(-.4) + " " +  str(3) ))
+        os.system("echo $MY_SUDO_PASS | sudo -S %s"% (program_path + "0 0 " + distX + " " +  str(3) ))
         app.possession_time = time.time()
-        app.logger.debug('right command accepted from ' + name)
+        app.logger.debug('leftright command accepted from ' + name)
     else:
-        app.logger.debug('right command REJECTED from ' + name)
-    return 'true'
-
-@app.route('/up_side')
-def up_side():
-    data1="FORWARD"
-    name=request.args.get('formname')
-    if name == app.true_name:
-        os.system("echo $MY_SUDO_PASS | sudo -S %s"% (servo_path + "-.5"))
-        app.possession_time = time.time()
-        app.logger.debug('forward command accepted from ' + name)
-    else:
-        app.logger.debug('forward command REJECTED from ' + name)
-    return 'true'
-
-@app.route('/down_side')
-def down_side():
-    data1="BACK"
-    name=request.args.get('formname')
-    if name == app.true_name:
-        os.system("echo $MY_SUDO_PASS | sudo -S %s"% (servo_path + ".5" ))
-        #os.system(program_path + "-.5 0 0 " +  str(3) )
-        app.possession_time = time.time()
-        app.logger.debug('down command accepted from ' + name)
-    else:
-        app.logger.debug('down command REJECTED from ' + name)
+        app.logger.debug(' leftright command REJECTED from ' + name)
     return 'true'
 
 @app.route('/stop')

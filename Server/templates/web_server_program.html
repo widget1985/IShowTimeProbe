@@ -4,6 +4,15 @@
     </head>
     
     <style>
+#maincontainer{
+  width: 300px;
+  height: 250px;
+  display: grid;
+  grid-template-columns: repeat(2,2fr);
+  grid-gap: 40px;
+  align-items: end;
+}
+
 #container {
   width: 200px;
   height: 200px;
@@ -12,7 +21,45 @@
   border-radius: 50%;
 }
 
+#updown {
+  width: 25px;
+  height: 200px;
+  background: grey;
+}
+
+#leftright {
+  width: 200px;
+  height: 25px;
+  background: grey;
+}
+
 #cursor {
+  width: 25px;
+  height: 25px;
+  position: relative;
+  background-color: red;
+  border-radius: 50%;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+#cursorlr {
+  width: 25px;
+  height: 25px;
+  position: relative;
+  background-color: red;
+  border-radius: 50%;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+#cursorud {
   width: 25px;
   height: 25px;
   position: relative;
@@ -34,7 +81,7 @@
         <!-- video server portion -->
         <div style="float:left">
              <!img src="http://192.168.1.176:8090/?action=stream" />
-            <img src="http://192.168.1.67:8075/?action=stream" />
+            <img src="http://192.168.0.38:8075/?action=stream" />
         </div>
         
 
@@ -46,20 +93,30 @@
             <div id='incontrol'>
                 <div> 
                     <center><h2>Control Robot</h2><br><br></center>
-                    
+                     <!--old controls>
                     <center><a href="#" id="up" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br></center>
                     <a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
                     <center><a href="#" id="down" style="font-size:30px;text-decoration:none;"> Backward<br> &#x1F883;&#x1F883;</a></center>
-                    
-                    <p>Robo will no longer take orders from you after </p>
-                    <p id='timeleft'></p>
-                    <p>more seconds of inactivity</p>
+                     <-->
+                   
                     
                      <!-- replace the top controls with this? -->
-                    <div id ="container">
-                        <div id ="cursor"></div>
+                    <div id = "maincontainer">
+                        <div id ="container">
+                            <div id ="cursor"></div>
+                        </div>
+                        <div id ="leftright">
+                            <div id ="cursorlr"></div>
+                        </div>
+                        <div id ="updown">
+                            <div id ="cursorud"></div>
+                        </div>
+                        
                     </div>
+                     <p>Robo will no longer take orders from you after </p>
+                    <p id='timeleft'></p>
+                    <p>more seconds of inactivity</p>
                     
                 </div>
             </div>
@@ -78,54 +135,54 @@
         </div>
 
         <script>
-            var elem = document.getElementById("cursor");
+            var crsr = document.getElementById("cursor");
+            var crsrlr = document.getElementById("cursorlr");
+            var crsrud = document.getElementById("cursorud");
+            
             var cnt = document.getElementById("container");
+            var ud = document.getElementById("updown");
+            var lr = document.getElementById("leftright");
 
             $( document ).ready(function(){
                 qstring = '?formname='+ document.getElementById('formname').value
-
-                $("#down").on("mousedown", function() {
-                 $.get('/down_side'+qstring);
-                 }).on('mouseup', function() {
-                 $.get('/stop'+qstring);
-                });
-
-                $("#up").on("mousedown", function() {
-                 $.get('/up_side'+qstring);
-                 }).on('mouseup', function() {
-                 $.get('/stop'+qstring);
-                });
-
-                $("#left").on("mousedown", function() {
-                 $.get('/left_side'+qstring);
-                 }).on('mouseup', function() {
-                 $.get('/stop'+qstring);
-                });
-
-                $("#right").on("mousedown", function() {
-                 $.get('/right_side'+qstring);
-                 }).on('mouseup', function() {
-                 $.get('/stop'+qstring);
-                });
 
                 $("#assume_control").on("click", function() {
                  $.get('/assume_control', {"formname": document.getElementById('formname').value}, userfeedback)
                 });
 
                 $("#container").on("mousedown", function(e){
-                  coords = getClickPosition(e);
+                  coords = getClickPosition(e, crsr);
                   $.get('/polar_in', {
                     "formname": document.getElementById('formname').value,
-                    //"distance": coords.distance,
-                    //"radians": coords.radians
-                    "distX": coords.X,
-                    "distY": coords.Y
+                    "distX": -coords.X,
+                    "distY": -coords.Y
                   })
                 }).on('mouseup', function(){
                     $.get('/stop', {
                       "formname": document.getElementById('formname').value
                     })
-                    resetToCenter();
+                    setToCenter(crsr, cnt);
+                });
+                
+                $("#updown").on("mousedown", function(e){
+                  coords = getClickPosition(e, crsrud, "y");
+                  $.get('/updown_in', {
+                    "formname": document.getElementById('formname').value,
+                    "distY": coords.Y
+                  })
+                });
+                
+                $("#leftright").on("mousedown", function(e){
+                  coords = getClickPosition(e, crsrlr, "x");
+                  $.get('/leftright_in', {
+                    "formname": document.getElementById('formname').value,
+                    "distX": -coords.X
+                  })
+                }).on('mouseup', function(){
+                    $.get('/stop', {
+                      "formname": document.getElementById('formname').value
+                    })
+                    setToCenter(crsrlr, lr);
                 });
 
                 function feedbackcallback(data, textStatus, jqXHR){
@@ -160,31 +217,37 @@
             //code for using the "joystick drive"
             //right now it only outputs commands to the console
 
-        function setToCenter(e){
+        function setToCenter(e, cntr){
             var parentPosition = getPosition(e.currentTarget);
-            var xPosition =  -parentPosition.x + cnt.clientWidth/2 - (elem.clientWidth / 2);
-            var yPosition =  -parentPosition.y + cnt.clientHeight/2 - (elem.clientHeight / 2);
-            elem.style.left = xPosition + "px";
-            elem.style.top = yPosition + "px";
+            var xPosition =  -parentPosition.x + cntr.clientWidth/2 - (e.clientWidth / 2);
+            var yPosition =  -parentPosition.y + cntr.clientHeight/2 - (e.clientHeight / 2);
+            e.style.left = xPosition + "px";
+            e.style.top = yPosition + "px";
             console.log("center: " + xPosition + " " + yPosition);
         }
 
-        setToCenter(elem);
-
+        setToCenter(crsr, cnt);
+        setToCenter(crsrud, ud);
+        setToCenter(crsrlr, lr);
+        
         function resetToCenter(){
-            setToCenter(elem);
+            setToCenter(crsr, cnt);
         }
 
         //gets click position and converts it to polarCoordinates
         //make these coordinates go to the robot eventually
-        function getClickPosition(e) {
+        function getClickPosition(e, crs, xy = "xy") {
             var parentPosition = getPosition(e.currentTarget);
             
-            var xPosition = e.clientX - parentPosition.x - (elem.clientWidth / 2);
-            var yPosition = e.clientY - parentPosition.y - (elem.clientHeight / 2);
+            var xPosition = e.clientX - parentPosition.x - (crs.clientWidth / 2);
+            var yPosition = e.clientY - parentPosition.y - (crs.clientHeight / 2);
             
-            elem.style.left = xPosition + "px";
-            elem.style.top = yPosition + "px";
+            if(xy === "x" || xy === "xy"){
+                crs.style.left = xPosition + "px";
+            }
+            if(xy === "y" || xy === "xy"){
+                crs.style.top = yPosition + "px";
+            }
             
             xParentCenter = parentPosition.x + cnt.clientWidth/2;
             yParentCenter = parentPosition.y + cnt.clientHeight/2;

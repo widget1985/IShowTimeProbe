@@ -57,9 +57,9 @@ void motors_set_motion(double x, double y, double rot){
     BR += x;
     BL += x;
     
-    FR -= y;
+    FR += y;
     FL -= y;
-    BR += y;
+    BR -= y;
     BL += y;
     
     FR += rot;
