@@ -7,6 +7,7 @@
 #include <rc/adc.h>
 #include <rc/dsm.h>
 #include <rc/servo.h>
+#include <rc/led.h>
 
 static int running = 1;
 static long running_counter = 0;
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
     // turn on power
     //printf("Turning On 6V Servo Power Rail\n");
     rc_servo_power_rail_en(1);
+    
+    rc_led_set(RC_LED_GREEN,1);
+    
     while(running){
         if(rc_servo_send_pulse_normalized(1, servo_pos)==-1) return -1;
         // sleep roughly enough to maintain frequency_hz
@@ -58,6 +62,10 @@ int main(int argc, char *argv[])
     rc_usleep(50000);
      // turn off power rail and cleanup
     rc_servo_power_rail_en(0);
+    
+    rc_led_set(RC_LED_GREEN,0);
+    
     rc_servo_cleanup();
+    rc_led_cleanup();
     return 0;
 }

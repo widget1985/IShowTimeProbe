@@ -103,7 +103,7 @@ int main(int argc, char** argv){
     if(rc_motor_init_freq(freq_hz)) return -1;
     
     rc_led_set(RC_LED_GREEN,1);
-    rc_led_set(RC_LED_RED,1);
+    //rc_led_set(RC_LED_RED,1);
     
     //free spin all motors?
     rc_motor_free_spin(0);
@@ -115,6 +115,7 @@ int main(int argc, char** argv){
     motors_set_forward(0);    
     
     rc_motor_brake(0);
+    rc_led_set(RC_LED_GREEN,0);
     
     rc_motor_cleanup();
     rc_led_cleanup();
